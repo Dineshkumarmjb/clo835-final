@@ -1,0 +1,84 @@
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_ecr_repository" "webapp_repo" {
+  name = "clo835-webapp"
+}
+
+resource "aws_ecr_repository" "mysql_repo" {
+  name = "clo835-mysql"
+}
+
+resource "aws_key_pair" "generated_key" {
+  key_name   = var.key_name
+  public_key = file(var.public_key_path)
+}
+
+resource "aws_instance" "web_ec2" {
+  ami           = "ami-09e6f87a47903347c" # Amazon Linux 2 in us-east-1
+  instance_type = "t2.micro"
+  key_name      = aws_key_pair.generated_key.key_name
+
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  subnet_id              = data.aws_subnet.public_subnet.id
+  tags = {
+    Name = "clo835-web-instance"
+  }
+}
+
+resource "aws_security_group" "web_sg" {
+  name        = "clo835-sg"
+  description = "Allow SSH and app traffic"
+  vpc_id      = data.aws_vpc.default.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 8081
+    to_port     = 8083
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+data "aws_vpc" "default" {
+  default = true
+}
+
+data "aws_subnet" "public_subnet" {
+  filter {
+    name   = "default-for-az"
+    values = ["true"]
+  }
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+
+  availability_zone = "us-east-1a"
+}
+resource "aws_s3_bucket" "background_images" {
+  bucket = "clo835-backgrounds-final"
+}
+resource "aws_s3_bucket_public_access_block" "background_images" {
+  bucket = aws_s3_bucket.background_images.id
+  
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
