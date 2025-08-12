@@ -1,0 +1,19 @@
+apiVersion: v1
+data:
+  BACKGROUND_IMAGE_URL: iron.jpg
+  DATABASE: employees
+  DBHOST: mysql-service
+  DBPORT: "3306"
+  S3_BUCKET: clo835-backgrounds-final
+  TEAM_NAME: DataWarriors
+  TEAM_SLOGAN: Conquering Data, One Query at a Time!
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"BACKGROUND_IMAGE_URL":"iron.jpg","DATABASE":"employees","DBHOST":"mysql-service","DBPORT":"3306","S3_BUCKET":"clo835-backgrounds-final","TEAM_NAME":"DataWarriors","TEAM_SLOGAN":"Conquering Data, One Query at a Time!"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"app-config","namespace":"fp"}}
+  creationTimestamp: "2025-08-12T00:31:14Z"
+  name: app-config
+  namespace: fp
+  resourceVersion: "5923"
+  uid: 501a4193-61e2-40ba-b8a5-a4c90dd6f36f
